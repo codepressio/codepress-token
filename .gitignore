@@ -1,3 +1,16 @@
+# ide files
+.vscode/
+.settings/
+.idea/
+.classpath
+.project
+
+# compiled files
+*.class
+target/
+build/
+out/
+
 # Logs
 logs
 *.log
@@ -56,4 +69,8 @@ typings/
 
 # dotenv environment variables file
 .env
+
+# other files
+.tmp/
+tmp/
 
