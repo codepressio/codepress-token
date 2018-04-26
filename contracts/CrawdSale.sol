@@ -22,13 +22,16 @@ contract CrowdSale {
 
     function CrowdSale(
         address addressOfSuccessfulSendTo,
-        address addressOfTokenUsedAsReward
+        address addressOfTokenUsedAsReward,
+        uint durationInMinutes,
+        uint etherCostOfEachToken,
+        uint fundingGoalInEther
     ) public {
         beneficiary = addressOfSuccessfulSendTo;
         tokenReward = token(addressOfTokenUsedAsReward);
-        fundingGoal = 20000 * 1 ether;
-        deadline = now + 5 * 1 minutes;
-        price = 0.0001 * 1 ether; // 1eth = 10000
+        fundingGoal = fundingGoalInEther * 1 ether;
+        deadline = now + durationInMinutes * 1 minutes;
+        price = etherCostOfEachToken * 1 ether; // 1eth = 10000
     }
 
     
