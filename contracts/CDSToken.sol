@@ -5,7 +5,7 @@ import "./SafeMath.sol";
 import "./EIP20Interface.sol"; 
 
 
-contract CPToken is Owned, SafeMath, EIP20Interface {
+contract CDSToken is Owned, SafeMath, EIP20Interface {
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -19,7 +19,7 @@ contract CPToken is Owned, SafeMath, EIP20Interface {
     event Freeze(address indexed from, uint256 value);
     event Unfreeze(address indexed from, uint256 value);
 
-    function CPToken() public {
+    function CDSToken() public {
         name = "CodePress Token";
         symbol = "CPT";
         decimals = 18;

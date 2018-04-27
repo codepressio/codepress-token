@@ -1,8 +1,8 @@
-var CPToken = artifacts.require("./CPToken.sol")
+var CDSToken = artifacts.require("./CDSToken.sol")
 
-contract('CPToken', async(accounts) => {
+contract('CDSToken', async(accounts) => {
     it("test create", async() => {
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
         let balance = await instance.balanceOf.call(accounts[0])
         assert.equal(3 * (10 ** 8) * (10 ** 18), balance.valueOf(), "0.3B wasn't in the first account");
         
@@ -13,7 +13,7 @@ contract('CPToken', async(accounts) => {
         let user1 = accounts[1]
         let user2 = accounts[2]
 
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
         let ownerBalance = await instance.balanceOf.call(owner)
         let user1Balance = await instance.balanceOf.call(user1)
         let user2Balance = await instance.balanceOf.call(user2)
@@ -38,7 +38,7 @@ contract('CPToken', async(accounts) => {
         let owner = accounts[0]
         let user3 = accounts[3]
 
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
 
         let ownerBalance = await instance.balanceOf.call(owner)
         let user3Balance = await instance.balanceOf.call(user3)
@@ -79,7 +79,7 @@ contract('CPToken', async(accounts) => {
         let user2 = accounts[2]
         let user5 = accounts[5]
 
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
 
         let ownerBalance = await instance.balanceOf.call(owner)
         let user1Balance = await instance.balanceOf.call(user1)
@@ -136,7 +136,7 @@ contract('CPToken', async(accounts) => {
     it("test send ether to contract", async() => {
         let owner = accounts[0]
         let user1 = accounts[1]
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
         try {
             let result = await instance.sendTransaction({value: 3 * 10**18, from: owner})
             assert.equal(1, 0, "test fail, owner's ether sent to contract")
@@ -156,7 +156,7 @@ contract('CPToken', async(accounts) => {
         let owner = accounts[0]
         let user1 = accounts[1]
         let user2 = accounts[2]
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
 
         let user1Balance = await instance.balanceOf.call(user1)
         assert.equal(user1Balance.toNumber(), 1000, "User 1 balance wasn't correctly")
@@ -209,7 +209,7 @@ contract('CPToken', async(accounts) => {
     it("test transferOwnership", async() => {
         let owner = accounts[0]
         let newOwner = accounts[1]
-        let instance = await CPToken.deployed()
+        let instance = await CDSToken.deployed()
         let expectOwner = await instance.owner.call()
         assert.equal(expectOwner.valueOf(), owner, "Owner isn't correct")
         await instance.transferOwnership(newOwner)

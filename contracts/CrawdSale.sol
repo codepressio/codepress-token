@@ -5,7 +5,7 @@ interface token {
     function transfer(address _to, uint256 _value) public returns (bool success);
 }
 
-
+// for test, not use on production
 contract CrowdSale {
     address public beneficiary;
     uint public fundingGoal;
