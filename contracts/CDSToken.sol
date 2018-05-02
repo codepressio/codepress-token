@@ -21,7 +21,7 @@ contract CDSToken is Owned, SafeMath, EIP20Interface {
 
     function CDSToken() public {
         name = "CodePress Token";
-        symbol = "CPT";
+        symbol = "CDS";
         decimals = 18;
         totalSupply = 300000000 * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
