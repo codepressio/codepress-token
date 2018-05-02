@@ -27,7 +27,7 @@ contract CDSToken is Owned, SafeMath, EIP20Interface {
         balances[msg.sender] = totalSupply;
     }
 
-    // gbt part
+    // cds part
     function freeze(address _addr, uint256 _value) public onlyOwner returns (bool success) {
         require(balances[_addr] >= _value);
         require(_value > 0);

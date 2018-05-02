@@ -1,11 +1,11 @@
-var CDSToken = artifacts.require("./CDSToken.sol")
+var CDSToken = artifacts.require('./CDSToken.sol')
+
 
 contract('CDSToken', async(accounts) => {
     it("test create", async() => {
         let instance = await CDSToken.deployed()
         let balance = await instance.balanceOf.call(accounts[0])
-        assert.equal(3 * (10 ** 8) * (10 ** 18), balance.valueOf(), "0.3B wasn't in the first account");
-        
+        assert.equal(3 * (10 ** 8) * (10 ** 18), balance.valueOf(), "0.3B wasn't in the first account")
     })
 
     it("test transfer", async() => {
@@ -44,33 +44,11 @@ contract('CDSToken', async(accounts) => {
         let user3Balance = await instance.balanceOf.call(user3)
         assert.equal(user3Balance.toNumber(), 0, "User 3 balance wasn't correctly")
 
-        try {
-            await instance.transfer(user3, 2 ** 256 , {from: owner})
-            assert.equal(1, 0, "test fail, sent coin overflow")
-        } catch(e) {
-            //ignore it. expected
-        }
-
-        try {
-            await instance.transfer(user3, 2 ** 256 - 1 , {from: owner})
-            assert.equal(1, 0, "test fail, sent coin overflow")
-        } catch(e) {
-            //ignore it. expected
-        }
-
-        try {
-            await instance.transfer(owner, -1, {from: user3})
-            assert.equal(1, 0, "test fail, sent coin overflow")
-        } catch(e) {
-            //ignore it. expected
-        }
-
-        try {
-            await instance.transfer(owner, 1, {from: user3})
-            assert.equal(1, 0, "test fail, not enough money")
-        } catch(e) {
-            //ignore it. expected
-        }
+        
+        await expectThrow(instance.transfer(user3, 2 ** 256 , {from: owner}))
+        await expectThrow(instance.transfer(user3, 2 ** 256 - 1 , {from: owner}))
+        await expectThrow(instance.transfer(owner, -1, {from: user3}))
+        await expectThrow(instance.transfer(owner, 1, {from: user3}))
     })
 
     it("test approve and transfer from", async() => {
@@ -85,77 +63,36 @@ contract('CDSToken', async(accounts) => {
         let user1Balance = await instance.balanceOf.call(user1)
 
 
-        try {
-            await instance.transferFrom(user1, user5, 500)
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-
-        }
+        
+        await expectThrow(instance.transferFrom(user1, user5, 500))
         
         await instance.approve(user5, 500, {from: user1})
         let user5Allowed = await instance.allowance.call(user1, user5)
         assert.equal(user5Allowed.toNumber(), 500, "test allowed fail")
         // todo test transfer from
 
-        try {
-            await instance.transferFrom(user1, user5, -1, {from: user1})
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-            // ignore
-        }
-
-        try {
-            await instance.transferFrom(user1, user5, 501, {from: user1})
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-            // ignore
-        }
-
-        try {
-            await instance.transferFrom(user1, user5, 501, {from: user2})
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-            // ignore
-        }
-
-        try {
-            await instance.transferFrom(user1, user5, 2 ** 32, {from: user1})
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-            // ignore
-        }
-
-        try {
-            await instance.transferFrom(user5, user1, 2 ** 32, {from: user5})
-            assert.equal(1, 0, "test fail, transfer from should not happen")
-        } catch(e) {
-            // ignore
-        }        
+        await expectThrow(instance.transferFrom(user1, user5, -1, {from: user1}))
+        await expectThrow(instance.transferFrom(user1, user5, 501, {from: user1}))
+        await expectThrow(instance.transferFrom(user1, user5, 501, {from: user2}))
+        await expectThrow(instance.transferFrom(user1, user5, 2 ** 32, {from: user1}))
+        await expectThrow(instance.transferFrom(user5, user1, 2 ** 32, {from: user5}))
     })
 
     it("test send ether to contract", async() => {
         let owner = accounts[0]
         let user1 = accounts[1]
         let instance = await CDSToken.deployed()
-        try {
-            let result = await instance.sendTransaction({value: 3 * 10**18, from: owner})
-            assert.equal(1, 0, "test fail, owner's ether sent to contract")
-        } catch(e) {
-            //ignore it. expected
-        }
-
-        try {
-            let result = await instance.sendTransaction({value: 3 * 10**18, from: user1})
-            assert.equal(1, 0, "test fail, user1's ether sent to contract")
-        } catch(e) {
-            //ignore it. expected
-        }
+        await expectThrow(instance.sendTransaction({value: 3 * 10**18, from: owner}))
+        await expectThrow(instance.sendTransaction({value: 3 * 10**18, from: user1}))
     })
 
     it("test freeze & unfreeze", async() => {
         let owner = accounts[0]
         let user1 = accounts[1]
         let user2 = accounts[2]
+        let user3 = accounts[3]
+        let user4 = accounts[4]
+        
         let instance = await CDSToken.deployed()
 
         let user1Balance = await instance.balanceOf.call(user1)
@@ -176,34 +113,20 @@ contract('CDSToken', async(accounts) => {
         let frozenOfUser1AfterUnfreezePart = await instance.frozenOf.call(user1)
         assert.equal(frozenOfUser1AfterUnfreezePart.toNumber(), 500 - 250, "User 1 frozen balance wasn't correctly")
 
-        try {
-            await instance.freeze(user2, 500, {from: user1})
-            assert.equal(1, 0, "test fail, user1 is not owner")
-        } catch(e) {
-            // ignore , this is right
-        }
-
-        try {
-            await instance.freeze(user2, 1001, {from: owner})
-            assert.equal(1, 0, "test fail, user2 not enough money")
-        } catch(e) {
-            // ignore , this is right
-        }
-
-        try {
-            await instance.freeze(user2, -1, {from: owner})
-            assert.equal(1, 0, "test fail")
-        } catch(e) {
-            // ignore , this is right
-        }
-
-        try {
-            await instance.freeze(user2, 2 ** 32, {from: owner})
-            assert.equal(1, 0, "test fail, overflow")
-        } catch(e) {
-            // ignore , this is right
-        }
         
+        await expectThrow(instance.freeze(user2, 500, {from: user1}))
+        await expectThrow(instance.freeze(user2, 1001, {from: owner}))
+        await expectThrow(instance.freeze(user2, -1, {from: owner}))
+        await expectThrow(instance.freeze(user2, 2 ** 32, {from: owner}))
+        // test transfer over frozen
+        await expectThrow(instance.transfer(user3, 751, {from: user1}))
+
+        // test transfer ok
+        let user3Balance1 = await instance.balanceOf.call(user3)
+        assert.equal(user3Balance1.toNumber(), 0, "User 3 balance wasn't correctly")
+        await instance.transfer(user3, 250 , {from: user1})
+        let user3BalanceAfterTransfer = await instance.balanceOf.call(user3)
+        assert.equal(user3BalanceAfterTransfer.toNumber(), 250, "User 3 balance wasn't correctly")
     })
 
     it("test transferOwnership", async() => {
@@ -217,3 +140,20 @@ contract('CDSToken', async(accounts) => {
         assert.equal(expectNewOwner.valueOf(), newOwner, "Owner isn't correct")
     })
 })
+
+
+var expectThrow = async promise => {
+    try {
+      await promise
+    } catch (error) {
+      const invalidOpcode = error.message.search('invalid opcode') >= 0
+      const outOfGas = error.message.search('out of gas') >= 0
+      const revert = error.message.search('revert') >= 0
+      assert(
+        invalidOpcode || outOfGas || revert,
+        'Expected throw, got \'' + error + '\' instead',
+      )
+      return
+    }
+    assert.fail('Expected throw not received')
+  };
