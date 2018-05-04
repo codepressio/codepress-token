@@ -2,10 +2,11 @@ pragma solidity ^0.4.21;
 
 import "./Owned.sol";
 import "./SafeMath.sol";
+import "./Pausable.sol"; 
 import "./EIP20Interface.sol"; 
 
 
-contract CDSToken is Owned, SafeMath, EIP20Interface {
+contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
     string public name;
     string public symbol;
     uint8 public decimals;
@@ -55,7 +56,7 @@ contract CDSToken is Owned, SafeMath, EIP20Interface {
         return balances[_owner];
     }
 
-    function transfer(address _to, uint256 _value) public returns (bool success) {
+    function transfer(address _to, uint256 _value) public notPaused returns (bool success) {
         require(balances[msg.sender] >= _value);
         require(balances[_to] + _value >= balances[_to]);
         balances[msg.sender] -= _value;
@@ -64,7 +65,7 @@ contract CDSToken is Owned, SafeMath, EIP20Interface {
         return true;
     }
 
-    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) notPaused public returns (bool success) {
         require(balances[_from] >= _value);
         require(balances[_to] + _value >= balances[_to]);
         require(allowed[_from][msg.sender] >= _value);
@@ -75,7 +76,7 @@ contract CDSToken is Owned, SafeMath, EIP20Interface {
         return true;
     }
 
-    function approve(address _spender, uint256 _value) public returns (bool success) {
+    function approve(address _spender, uint256 _value) public notPaused returns (bool success) {
         require(_value > 0);
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);

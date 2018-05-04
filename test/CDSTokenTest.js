@@ -2,6 +2,7 @@ var CDSToken = artifacts.require('./CDSToken.sol')
 
 
 contract('CDSToken', async(accounts) => {
+
     it("test create", async() => {
         let instance = await CDSToken.deployed()
         let balance = await instance.balanceOf.call(accounts[0])
@@ -61,7 +62,7 @@ contract('CDSToken', async(accounts) => {
 
         let ownerBalance = await instance.balanceOf.call(owner)
         let user1Balance = await instance.balanceOf.call(user1)
-
+        let user5Balance = await instance.balanceOf.call(user5)
 
         
         await expectThrow(instance.transferFrom(user1, user5, 500))
@@ -76,6 +77,10 @@ contract('CDSToken', async(accounts) => {
         await expectThrow(instance.transferFrom(user1, user5, 501, {from: user2}))
         await expectThrow(instance.transferFrom(user1, user5, 2 ** 32, {from: user1}))
         await expectThrow(instance.transferFrom(user5, user1, 2 ** 32, {from: user5}))
+
+        await instance.transferFrom(user1, user5, 500, {from: user5})
+        let user5BalanceEnd = await instance.balanceOf.call(user5)
+        assert.equal(user5Balance.toNumber() + 500, user5BalanceEnd, "user 5 balance not ok")
     })
 
     it("test send ether to contract", async() => {
@@ -95,6 +100,8 @@ contract('CDSToken', async(accounts) => {
         
         let instance = await CDSToken.deployed()
 
+
+        await instance.transfer(user1, 500, {from: owner}) // don't forget user1 allowed user5 500, user5 transfer from user1, so we fill it again.
         let user1Balance = await instance.balanceOf.call(user1)
         assert.equal(user1Balance.toNumber(), 1000, "User 1 balance wasn't correctly")
 
@@ -127,6 +134,38 @@ contract('CDSToken', async(accounts) => {
         await instance.transfer(user3, 250 , {from: user1})
         let user3BalanceAfterTransfer = await instance.balanceOf.call(user3)
         assert.equal(user3BalanceAfterTransfer.toNumber(), 250, "User 3 balance wasn't correctly")
+    })
+
+    it("test pause & uppause", async() => {
+        let owner = accounts[0]
+        let notOwner = accounts[1]
+        let richMan = accounts[8]
+        let poorMan = accounts[9]
+
+        let instance = await CDSToken.deployed()
+        let expectOwner = await instance.owner.call()
+        assert.equal(expectOwner.valueOf(), owner, "Owner isn't correct")
+
+        await instance.transfer(richMan, 10000, {from: owner})
+        let richManBalance = await instance.balanceOf.call(richMan)
+        assert.equal(richManBalance.toNumber() > 1, true, "Rich Man, ahh?")
+
+        await expectThrow(instance.pause({from: notOwner})) // not owner
+        await instance.pause({from: owner})
+        await expectThrow(instance.transfer(poorMan, 1, {from: richMan})) // paused
+        await expectThrow(instance.approve(poorMan, 1, {from: richMan})) // paused
+        await expectThrow(instance.unpause({from: notOwner})) // not owner
+
+        await instance.unpause({from: owner})
+        await instance.transfer(poorMan, 1, {from: richMan}) // ok now
+        await instance.approve(poorMan, 1, {from: richMan}) // ok now
+
+        await instance.pause({from: owner})
+        await expectThrow(instance.transferFrom(richMan, poorMan, 1, {from: richMan})) // paused
+        await instance.unpause({from: owner})
+        let poorManAllowd = await instance.allowance.call(richMan, poorMan)
+        assert.equal(poorManAllowd.toNumber(), 1, "Poor Man, ahh?")
+        await instance.transferFrom(richMan, poorMan, 1, {from: poorMan}) // ok now
     })
 
     it("test transferOwnership", async() => {
