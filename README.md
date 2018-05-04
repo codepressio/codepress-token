@@ -6,12 +6,19 @@ CodePress Token is ERC20 based
 
 ## Installation
 
-* Install NPM
-* Install Truffle
-* Install Ganache
+1. Install [Yarn](https://yarnpkg.com)
+2. Run "yarn install"
 
 ## Run Test
 
 ```bash
-truffle test
+yarn run testrpc
+yarn truffle compile
+yarn truffle test
+```
+
+## Run Migrate
+
+```bash
+yarn truffle migrate
 ```
