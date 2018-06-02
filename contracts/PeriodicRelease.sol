@@ -3,10 +3,7 @@ pragma solidity ^0.4.21;
 import "./Owned.sol";
 import "./SafeMath.sol";
 import "./Pausable.sol"; 
-
-interface token {
-    function transfer(address _to, uint256 _value) public returns (bool success);
-}
+import "./CDSToken.sol";
 
 /**
 商业推广：25% 200,000,000 每三个月,解锁 10%
@@ -19,29 +16,33 @@ interface token {
 0xd995ae8480E215212ca4c22528997EaEd6085fd9
  */
 
-contract PeriodicWithdrawal is Owned, SafeMath, Pausable {
+contract PeriodicRelease is Owned, SafeMath, Pausable {
     address public community;
     address public commerce;
     address public team;
 
-    token public tokenCDS;
+    CDSToken public token;
     address public tokenOwner;
     uint8 public period;
+    uint256 public startTimestamp;
     mapping (address => uint256) public balances; 
     mapping (address => uint256) public transfered; // count of reward transfered.
 
     event TokenTransfer(address to, uint256 amount);
 
-    function PeriodicWithdrawal(
-        address addressOfTokenUsedAsReward,
-        address addressOfCommunity,
-        address addressOfCommerce,
-        address addressOfTeam
+    function PeriodicRelease(
+        CDSToken _token,
+        address _community,
+        address _commerce,
+        address _team,
+        uint256 _startTimestamp
     ) public {
-        tokenCDS = token(addressOfTokenUsedAsReward);
-        community = addressOfCommunity;
-        commerce = addressOfCommerce;
-        team = addressOfTeam;
+        require(_startTimestamp > block.timestamp);
+        startTimestamp = _startTimestamp;
+        token = _token;
+        community = _community;
+        commerce = _commerce;
+        team = _team;
 
         // 社区: 35% 280,000,000 每三个月,解锁 10%
         balances[community] = 200000000 * (10 ** 18);
@@ -59,16 +60,9 @@ contract PeriodicWithdrawal is Owned, SafeMath, Pausable {
     }
 
     /**
-     * Withdraw the funds
+     * Release the token
      */
-    function safeWithdrawal() public notPaused {
-        if (fundingGoalReached && beneficiary == msg.sender) {
-            if (beneficiary.send(amountRaised)) {
-                emit FundTransfer(beneficiary, amountRaised, false);
-            } else {
-                //If we fail to send the funds to beneficiary, unlock funders balance
-                fundingGoalReached = false;
-            }
-        }
+    function releaseToken() public notPaused {
+       
     }
 }
