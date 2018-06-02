@@ -6,7 +6,7 @@ contract('CDSToken', async(accounts) => {
     it("test create", async() => {
         let instance = await CDSToken.deployed()
         let balance = await instance.balanceOf.call(accounts[0])
-        assert.equal(3 * (10 ** 8) * (10 ** 18), balance.valueOf(), "0.3B wasn't in the first account")
+        assert.equal(8 * (10 ** 8) * (10 ** 18), balance.valueOf(), "0.8B wasn't in the first account")
     })
 
     it("test transfer", async() => {
@@ -87,8 +87,8 @@ contract('CDSToken', async(accounts) => {
         let owner = accounts[0]
         let user1 = accounts[1]
         let instance = await CDSToken.deployed()
-        await expectThrow(instance.sendTransaction({value: 3 * 10**18, from: owner}))
-        await expectThrow(instance.sendTransaction({value: 3 * 10**18, from: user1}))
+        await expectThrow(instance.sendTransaction({value: 8 * 10**18, from: owner}))
+        await expectThrow(instance.sendTransaction({value: 8 * 10**18, from: user1}))
     })
 
     it("test freeze & unfreeze", async() => {

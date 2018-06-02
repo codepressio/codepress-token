@@ -24,7 +24,7 @@ contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
         name = "CodePress Token";
         symbol = "CDS";
         decimals = 18;
-        totalSupply = 300000000 * 10 ** uint256(decimals);
+        totalSupply = 800000000 * 10 ** uint256(decimals);
         balances[msg.sender] = totalSupply;
     }
 
