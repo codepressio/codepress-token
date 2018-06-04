@@ -73,4 +73,5 @@ typings/
 # other files
 .tmp/
 tmp/
+.DS_Store/
 

@@ -62,7 +62,7 @@ contract PeriodicRelease is Owned, SafeMath, Pausable {
     /**
      * Release the token
      */
-    function releaseToken() public notPaused {
+    function releaseToken() public onlyOwner notPaused {
        
     }
 }
