@@ -1,9 +1,85 @@
 pragma solidity ^0.4.21;
 
-import "./Owned.sol";
-import "./SafeMath.sol";
-import "./Pausable.sol"; 
-import "./EIP20Interface.sol"; 
+
+contract Owned {
+    address public owner;
+
+    function Owned() public {
+        owner = msg.sender;
+    }
+
+    modifier onlyOwner {
+        require(msg.sender == owner);
+        _;
+    }
+
+    function transferOwnership(address newOwner) public onlyOwner {
+        owner = newOwner;
+    }
+}
+
+
+contract SafeMath {
+    function mul(uint a, uint b) internal pure returns (uint) {
+        uint c = a * b;
+        assert(a == 0 || c / a == b);
+        return c;
+    }
+
+    function div(uint a, uint b) internal pure returns (uint) {
+        assert(b > 0);
+        uint c = a / b;
+        assert(a == b * c + a % b);
+        return c;
+    }
+
+    function sub(uint a, uint b) internal pure returns (uint) {
+        assert(b <= a);
+        return a - b;
+    }
+
+    function add(uint a, uint b) internal pure returns (uint) {
+        uint c = a + b;
+        assert(c >= a);
+        return c;
+    }
+}
+
+
+contract Pausable is Owned {
+    bool public paused = false;
+    event Pause();
+    event Unpause();
+
+    modifier notPaused {
+        require(!paused);
+        _;
+    }
+
+    function pause() public onlyOwner {
+        paused = true;
+        emit Pause();
+    }
+
+    function unpause() public onlyOwner {
+        paused = false;
+        emit Unpause();
+    }
+}
+
+
+contract EIP20Interface {
+    uint256 public totalSupply;
+
+    function balanceOf(address _owner) public view returns (uint256 balance);
+    function transfer(address _to, uint256 _value) public returns (bool success);
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);
+    function approve(address _spender, uint256 _value) public returns (bool success);
+    function allowance(address _owner, address _spender) public view returns (uint256 remaining);
+
+    event Transfer(address indexed _from, address indexed _to, uint256 _value); 
+    event Approval(address indexed _owner, address indexed _spender, uint256 _value);
+}
 
 
 contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
