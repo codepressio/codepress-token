@@ -1,5 +1,5 @@
 var Airdrop = artifacts.require('./Airdrop.sol')
-
+var CDSToken = artifacts.require('./CDSToken.sol')
 
 contract('Airdrop', async(accounts) => {
     it("test send candy", async() => {
@@ -8,12 +8,13 @@ contract('Airdrop', async(accounts) => {
         let user2 = accounts[2]
 
         let airdrop = await Airdrop.deployed()
-        console.log('contract deployed')
+        let cds = await CDSToken.deployed()
 
-        let size = 2
+        // trasfer cds to this contract
+        await cds.transfer(airdrop.address, 5000, {from: owner})
 
-        let receipts = [size]
-        let values = [size]
+        let receipts = []
+        let values = []
 
         await receipts.push(user1)
         await receipts.push(user2)
@@ -21,13 +22,12 @@ contract('Airdrop', async(accounts) => {
         await values.push(100)
         await values.push(1000)
         
-        console.log('receipts: ' + receipts)
-        console.log('values: ' + values)
         // send candy
         await airdrop.sendCandy(receipts, values, {from: owner})
-        console.log('candy sended ')
 
-        assert.equal(size, airdrop.receipts.length, "accounts length not equal")
+        let receiptsInAirdrop = await airdrop.receipts()
+        console.log(receiptsInAirdrop)
+        assert.equal(2, receiptsInAirdrop.length, "accounts length not equal")
     })
 })
 

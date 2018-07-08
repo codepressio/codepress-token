@@ -60,23 +60,23 @@ contract Airdrop is SafeMath, Owned {
     }
 
     function sendCandy(address[] dests, uint256[] values) onlyOwner public {
-        // require(dests.length > 0);
-        // require(dests.length == values.length);
+        require(dests.length > 0);
+        require(dests.length == values.length);
 
-        // // calculate total amount
-        // uint256 totalAmount = 0;
-        // for (uint i = 0; i < values.length; i++) {
-        //     totalAmount = add(totalAmount, values[i]);
-        // }
+        // calculate total amount
+        uint256 totalAmount = 0;
+        for (uint i = 0; i < values.length; i++) {
+            totalAmount = add(totalAmount, values[i]);
+        }
 
-        // require(totalAmount > 0, "total amount must > 0");
-        // require(totalAmount < token.balanceOf(this), "total amount must < this address token balance ");
+        require(totalAmount > 0, "total amount must > 0");
+        require(totalAmount < token.balanceOf(this), "total amount must < this address token balance ");
 
         // send amount
         for (uint j = 0; j < dests.length; j++) {
             token.transfer(dests[j], values[j]); // mul decimal
-            // receipts[dests[j]] = values[j];
-            // emit CandySent(dests[j], values[j]);
+            receipts[dests[j]] = values[j];
+            emit CandySent(dests[j], values[j]);
         }
     }
 }
