@@ -1,9 +1,9 @@
-pragma solidity ^0.4.21;
+pragma solidity ^0.4.24;
 
 contract Owned {
     address public owner;
 
-    function Owned() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -45,8 +45,8 @@ contract SafeMath {
 }
 
 interface CDS {
-    function transfer(address _to, uint256 _value) public returns (bool success);
-    function balanceOf(address _owner) public view returns (uint256 balance);
+    function transfer(address _to, uint256 _value) external returns (bool success);
+    function balanceOf(address _owner) external view returns (uint256 balance);
 }
 
 // for test, not use on production
@@ -54,7 +54,7 @@ contract Airdrop is SafeMath, Owned {
     CDS public token;
     event CandySent(address user, uint256 amount);
 
-    function Airdrop(address _addressOfToken) public {
+    constructor(address _addressOfToken) public {
         token = CDS(_addressOfToken);
     }
 
