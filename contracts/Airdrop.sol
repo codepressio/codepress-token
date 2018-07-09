@@ -51,7 +51,6 @@ interface CDS {
 
 // for test, not use on production
 contract Airdrop is SafeMath, Owned {
-    mapping(address => uint256) public receipts;
     CDS public token;
     event CandySent(address user, uint256 amount);
 
@@ -59,7 +58,7 @@ contract Airdrop is SafeMath, Owned {
         token = CDS(_addressOfToken);
     }
 
-    function sendCandy(address[] dests, uint256[] values) onlyOwner public {
+    function sendCandy(address[] dests, uint256[] values) onlyOwner public returns(bool success) {
         require(dests.length > 0);
         require(dests.length == values.length);
 
@@ -72,11 +71,11 @@ contract Airdrop is SafeMath, Owned {
         require(totalAmount > 0, "total amount must > 0");
         require(totalAmount < token.balanceOf(this), "total amount must < this address token balance ");
 
-        // send amount
         for (uint j = 0; j < dests.length; j++) {
             token.transfer(dests[j], values[j]); // mul decimal
-            receipts[dests[j]] = values[j];
             emit CandySent(dests[j], values[j]);
         }
+
+        return true;
     }
 }
