@@ -1,10 +1,10 @@
-pragma solidity ^0.4.21;
+pragma solidity 0.4.24;
 
 
 contract Owned {
     address public owner;
 
-    function Owned() public {
+    constructor() public {
         owner = msg.sender;
     }
 
@@ -96,7 +96,7 @@ contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
     event Freeze(address indexed from, uint256 value);
     event Unfreeze(address indexed from, uint256 value);
 
-    function CDSToken() public {
+    constructor() public {
         name = "CodePress Token";
         symbol = "CDS";
         decimals = 18;
@@ -133,6 +133,7 @@ contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
     }
 
     function transfer(address _to, uint256 _value) public notPaused returns (bool success) {
+        require( _to != address(0));
         require(balances[msg.sender] >= _value);
         require(balances[_to] + _value >= balances[_to]);
         balances[msg.sender] -= _value;
@@ -142,6 +143,7 @@ contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
     }
 
     function transferFrom(address _from, address _to, uint256 _value) notPaused public returns (bool success) {
+        require( _to != address(0));
         require(balances[_from] >= _value);
         require(balances[_to] + _value >= balances[_to]);
         require(allowed[_from][msg.sender] >= _value);
@@ -153,7 +155,9 @@ contract CDSToken is Owned, SafeMath, Pausable, EIP20Interface {
     }
 
     function approve(address _spender, uint256 _value) public notPaused returns (bool success) {
+        require( _spender != address(0));
         require(_value > 0);
+        require((_value == 0)||(allowed[msg.sender][_spender] == 0));
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
         return true;
